@@ -207,6 +207,72 @@ input:focus {
     color: #8b0000;
 }
 
+.hud-combo {
+    font-size: 6px;
+    color: #5a7a1a;
+    letter-spacing: 1px;
+    height: 10px;
+    transition: color 0.1s;
+}
+
+.hud-combo.combo-active {
+    color: #e8a000;
+}
+
+.hud-combo.combo-broken {
+    color: #8b0000;
+    animation: combo-break 0.4s ease-out forwards;
+}
+
+@keyframes combo-break {
+    0% {
+        opacity: 1;
+        transform: scale(1.1);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+}
+
+/* Floating "+N xCOMBO" popup */
+.combo-popup {
+    position: absolute;
+    font-family: "Press Start 2P", monospace;
+    font-size: 8px;
+    letter-spacing: 1px;
+    pointer-events: none;
+    z-index: 20;
+    white-space: nowrap;
+    animation: combo-float 0.9s ease-out forwards;
+}
+
+.combo-popup.side-me {
+    color: #1a5c00;
+    left: 8px;
+}
+
+.combo-popup.side-opp {
+    color: #8b0000;
+    right: 8px;
+    text-align: right;
+}
+
+@keyframes combo-float {
+    0% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+    60% {
+        opacity: 1;
+        transform: translateY(-18px) scale(1.15);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-32px) scale(0.9);
+    }
+}
+
 #overlay-sub {
     font-size: 7px;
     color: #5a7a1a;

@@ -1,5 +1,5 @@
 // Win Conditions
-export const WIN_LENGTH = 100;
+export const WIN_LENGTH = 200;
 export const DEATH_MULTIPLIER = 2;
 
 // Game configuration
@@ -7,8 +7,10 @@ export const COLS = 28,
     ROWS = 22;
 export const CELL = 22;
 export const MS_TILE = 400;
-export const INITIAL_LENGTH = 9;
+export const INITIAL_LENGTH = 5;
 export const FRUIT_COUNT = 6;
+export const BLINK_DURATION = 2000;
+export const DEATH_ANIM_MS = 800;
 
 export const BORDER = 10;
 export const THICKNESS = 0.8;

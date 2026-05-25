@@ -1,10 +1,8 @@
-import { state } from "./state";
+import { Direction } from "../shared/types";
 import { connectWS, send } from "./network";
-import { Direction } from "./types";
-import { COLS, ROWS } from "./config";
-import { startGame, update, moveMe } from "./game";
+import { hooks } from "./hooks";
+import { state } from ".";
 
-// Initialize UI Listeners
 document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("btn-host")?.addEventListener("click", createRoom);
     document
@@ -16,7 +14,6 @@ document.addEventListener("DOMContentLoaded", () => {
         ?.addEventListener("click", requestRestart);
 });
 
-// UI Logic
 export function createRoom() {
     connectWS(() => send({ type: "create" }));
 }
@@ -49,8 +46,12 @@ export function setStatus(m: string) {
 export function updateHud() {
     const me = state.snakes[state.myId];
     const opp = state.snakes[1 - state.myId];
-    document.getElementById("score-me")!.textContent = String(me?.score ?? 0);
-    document.getElementById("score-opp")!.textContent = String(opp?.score ?? 0);
+    document.getElementById("score-me")!.textContent = String(
+        state.score[state.myId] ?? 0,
+    );
+    document.getElementById("score-opp")!.textContent = String(
+        state.score[1 - state.myId] ?? 0,
+    );
 }
 
 export function showOverlay(title: string, sub: string, tone: string) {
@@ -61,26 +62,20 @@ export function showOverlay(title: string, sub: string, tone: string) {
     const overlay = document.getElementById("overlay")!;
     overlay.classList.remove("hidden");
     overlay.classList.add("show");
-    state.wantRestart = false;
-    state.oppWantRestart = false;
+}
+
+export function hideOverlay() {
+    const overlay = document.getElementById("overlay")!;
+    overlay.classList.remove("show");
+    overlay.classList.add("hidden");
 }
 
 export function requestRestart() {
-    state.wantRestart = true;
-    send({ type: "restart" });
     document.getElementById("overlay-sub")!.textContent =
         "waiting for opponent...";
-    if (state.oppWantRestart) doRestart();
+    send({ type: "restart" });
 }
 
-export function doRestart() {
-    state.wantRestart = false;
-    state.oppWantRestart = false;
-    document.getElementById("overlay")!.classList.remove("show");
-    startGame();
-}
-
-// Input Logic
 const KEY_DIR: Record<string, Direction> = {
     ArrowUp: [0, -1],
     ArrowDown: [0, 1],
@@ -105,20 +100,77 @@ document.addEventListener("keydown", (e) => {
         return;
     }
 
-    update();
+    state.update();
 
     const dir = KEY_DIR[e.key];
     if (!dir || !state.gameRunning) return;
 
     const s = state.snakes[state.myId];
-    if (!s || !s.alive) return;
+    if (!s) return;
 
     const same = s.dir[0] === dir[0] && s.dir[1] === dir[1];
     const reversed = s.dir[0] + dir[0] === 0 && s.dir[1] + dir[1] === 0;
     if (same || reversed) return;
 
-    moveMe(dir, true);
-    s.spos = 0; // reset movement progress on direction change
+    state.moveSnake(state.myId, dir, true);
+    s.spos = 0;
 
     e.preventDefault();
 });
+
+const currentCombo: [number, number] = [1, 1];
+
+export function showCombo(pid: number, earned: number, newCombo: number) {
+    const isMe = pid === state.myId;
+    const badgeId = isMe ? "combo-me" : "combo-opp";
+    const badge = document.getElementById(badgeId)!;
+
+    const otherPid = 1 - pid;
+    const otherId = otherPid === state.myId ? "combo-me" : "combo-opp";
+    const otherBadge = document.getElementById(otherId)!;
+    if (currentCombo[otherPid] > 1) {
+        otherBadge.textContent = "BROKEN";
+        otherBadge.className = "hud-combo combo-broken";
+        setTimeout(() => {
+            otherBadge.textContent = "";
+            otherBadge.className = "hud-combo";
+        }, 500);
+    }
+
+    currentCombo[pid] = newCombo;
+    currentCombo[otherPid] = 1;
+
+    if (newCombo > 2) {
+        badge.textContent = `x${newCombo - 1} COMBO`;
+        badge.className = "hud-combo combo-active";
+    } else {
+        badge.textContent = "";
+        badge.className = "hud-combo";
+    }
+
+    const wrap = document.getElementById("overlay-wrap");
+    if (!wrap) return;
+
+    const popup = document.createElement("div");
+    popup.className = `combo-popup ${isMe ? "side-me" : "side-opp"}`;
+    popup.textContent =
+        earned > 1 ? `+${earned} ×${earned}COMBO` : `+${earned}`;
+    popup.style.top = "10px";
+    wrap.appendChild(popup);
+    setTimeout(() => popup.remove(), 950);
+}
+
+export function resetComboDisplay() {
+    currentCombo[0] = 1;
+    currentCombo[1] = 1;
+    const me = document.getElementById("combo-me");
+    const opp = document.getElementById("combo-opp");
+    if (me) {
+        me.textContent = "";
+        me.className = "hud-combo";
+    }
+    if (opp) {
+        opp.textContent = "";
+        opp.className = "hud-combo";
+    }
+}

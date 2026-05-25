@@ -5,10 +5,10 @@
     "description": "Multiplayer Snake Game",
     "main": "dist/server/index.js",
     "scripts": {
-        "dev:server": "nodemon --watch dist/server dist/server/index.js",
-        "dev:client": "vite",
-        "build": "tsc && vite build",
-        "dev": "concurrently \"tsc --watch\" \"npm run dev:server\" \"npm run dev:client\""
+        "build": "tsc --build server/tsconfig.json && vite build",
+        "dev": "concurrently \"tsc -p server/tsconfig.json --watch\" \"tsc -p shared/tsconfig.json --watch\" \"npm run dev:server\" \"npm run dev:client\"",
+        "dev:server": "nodemon dist/server/index.js",
+        "dev:client": "vite"
     },
     "dependencies": {
         "express": "^4.18.2",
