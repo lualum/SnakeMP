@@ -1,0 +1,25 @@
+name: Deploy snake-mp
+
+on:
+    push:
+        branches:
+            - main
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: SSH into VM, build, and reload
+              uses: appleboy/ssh-action@v1.0.3
+              with:
+                  host: ${{ secrets.VM_HOST }}
+                  username: ${{ secrets.VM_USER }}
+                  key: ${{ secrets.VM_SSH_KEY }}
+                  script: |
+                      cd /opt/snake-mp
+                      git pull origin main
+                      npm ci
+                      npm run build
+                      sudo systemctl restart snake-mp
+                      pm2 reload snake-mp

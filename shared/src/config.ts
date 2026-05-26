@@ -11,6 +11,7 @@ export const INITIAL_LENGTH = 5;
 export const FRUIT_COUNT = 6;
 export const BLINK_DURATION = 2000;
 export const DEATH_ANIM_MS = 800;
+export const COLLISION_GRACE = 0.5;
 
 export const BORDER = 10;
 export const THICKNESS = 0.8;

@@ -2,9 +2,10 @@ import * as http from "http";
 import { WebSocketServer, WebSocket } from "ws";
 import { GameHooks, State } from "@shared/state";
 import {
+    COLS,
     DEATH_ANIM_MS,
     DEATH_MULTIPLIER,
-    FRUIT_COUNT,
+    ROWS,
     WIN_LENGTH,
 } from "@shared/config";
 import { Point, WsMessage } from "@shared/types";
@@ -44,15 +45,6 @@ function broadcast(room: Room, msg: object): void {
         if (p.readyState === WebSocket.OPEN) p.send(raw);
 }
 
-function generateFruits(state: State): Point[] {
-    const fruits: Point[] = [];
-    for (let i = 0; i < FRUIT_COUNT; i++) {
-        const loc = state.getFruitLoc(i);
-        if (loc) fruits.push(loc);
-    }
-    return fruits;
-}
-
 function makeFruitsArray(state: State): Point[] {
     const fruits: Point[] = [];
     for (const [, pt] of state.fruits) fruits.push(pt);
@@ -61,8 +53,30 @@ function makeFruitsArray(state: State): Point[] {
 
 function makeHooks(code: string, getRoom: () => Room | undefined): GameHooks {
     return {
-        onMove(_pid, _dir) {
-            // Server doesn't need to react to its own movement ticks.
+        onMove(pid, _dir) {
+            const room = getRoom();
+            if (!room) return;
+            const snake = room.state.snakes[pid];
+            if (!snake) return;
+            const [hx, hy] = snake.body[0];
+
+            if (hx < 0 || hx >= COLS || hy < 0 || hy >= ROWS) {
+                room.state.kill(pid, "wall");
+                return;
+            }
+
+            const selfHit = snake.body
+                .slice(1)
+                .some(([bx, by]) => bx === hx && by === hy);
+            if (selfHit) {
+                room.state.kill(pid, "self");
+                return;
+            }
+
+            const opp = room.state.snakes[1 - pid];
+            if (opp?.body.some(([bx, by]) => bx === hx && by === hy)) {
+                room.state.kill(pid, "opponent");
+            }
         },
 
         onFruitEaten(pid, fruitId, newFruit) {
