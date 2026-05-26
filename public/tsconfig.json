@@ -1,9 +1,16 @@
 {
-    "extends": "../tsconfig.json",
+    "extends": "../tsconfig.base.json",
     "compilerOptions": {
-        "rootDir": "..",
-        "noEmit": true,
-        "lib": ["ES2020", "DOM", "DOM.Iterable"]
+        "ignoreDeprecations": "6.0",
+        "composite": true,
+        "outDir": "../dist/public",
+        "rootDir": "./src",
+        "tsBuildInfoFile": "../dist/public/.tsbuildinfo",
+        "baseUrl": ".",
+        "paths": {
+            "@shared/*": ["../shared/src/*"]
+        }
     },
-    "include": ["**/*.ts", "../shared/**/*.ts"]
+    "include": ["src"],
+    "references": [{ "path": "../shared" }]
 }

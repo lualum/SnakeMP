@@ -1,8 +1,9 @@
 import { state } from "./index";
-import { GameHooks } from "../shared/state";
+
 import { send } from "./network";
 import { showOverlay, updateHud, hideOverlay, resetComboDisplay } from "./ui";
 import { renderLoop } from "./render";
+import { GameHooks } from "@shared/state";
 
 export const hooks: GameHooks = {
     onMove(pid, dir) {

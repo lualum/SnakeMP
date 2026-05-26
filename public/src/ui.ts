@@ -1,7 +1,6 @@
-import { Direction } from "../shared/types";
 import { connectWS, send } from "./network";
-import { hooks } from "./hooks";
 import { state } from ".";
+import { Direction } from "@shared/types";
 
 document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("btn-host")?.addEventListener("click", createRoom);

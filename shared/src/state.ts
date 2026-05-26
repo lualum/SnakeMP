@@ -3,7 +3,6 @@ import {
     COLS,
     ROWS,
     INITIAL_LENGTH,
-    MS_TILE,
     FRUIT_COUNT,
     BLINK_DURATION,
 } from "./config";
@@ -42,7 +41,10 @@ export class State {
             for (let i = 0; i < initialFruits.length; i++)
                 this.fruits.set(i, initialFruits[i]);
         } else {
-            for (let i = 0; i < FRUIT_COUNT; i++) this.spawnFruit(i);
+            for (let i = 0; i < FRUIT_COUNT; i++) {
+                const loc = this.getFruitLoc(i);
+                if (loc) this.fruits.set(i, loc);
+            }
         }
 
         this.gameRunning = false;
@@ -75,7 +77,7 @@ export class State {
         this.snakes[pid] = { body, dir, spos: 0, deathStart: undefined };
     }
 
-    spawnFruit(id: number): Point | null {
+    getFruitLoc(id: number): Point | null {
         const candidates: boolean[][] = Array.from({ length: COLS }, () =>
             new Array(ROWS).fill(true),
         );
@@ -85,8 +87,7 @@ export class State {
             for (const [bx, by] of s.body) candidates[bx][by] = false;
         }
 
-        for (const [i, [fx, fy]] of this.fruits) {
-            if (i === id) continue;
+        for (const [fx, fy] of this.fruits.values()) {
             candidates[fx][fy] = false;
         }
 
@@ -98,7 +99,6 @@ export class State {
         if (openCells.length === 0) return null;
 
         const choice = openCells[Math.floor(Math.random() * openCells.length)];
-        this.fruits.set(id, choice);
         return choice;
     }
 
@@ -126,8 +126,7 @@ export class State {
         for (const [fid, [fx, fy]] of this.fruits) {
             if (fx === nx && fy === ny) {
                 this.fruits.delete(fid);
-                const newFruit = this.spawnFruit(fid);
-                if (newFruit) this.fruits.set(fid, newFruit);
+                const newFruit = this.getFruitLoc(fid);
                 fruit = fid;
                 this.hooks.onFruitEaten(pid, fid, newFruit);
                 break;

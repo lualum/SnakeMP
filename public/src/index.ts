@@ -1,8 +1,8 @@
 import "./ui";
 import "./network";
-import { State } from "../shared/state";
 import { hooks } from "./hooks";
-import { MS_TILE } from "../shared/config";
+import { State } from "@shared/state";
+import { MS_TILE } from "@shared/config";
 
 class ClientState extends State {
     ws: WebSocket | null = null;

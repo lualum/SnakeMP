@@ -7,7 +7,7 @@ import {
     resetComboDisplay,
 } from "./ui";
 import { state } from ".";
-import { WsMessage, Point } from "../shared/types";
+import { WsMessage } from "@shared/types";
 
 export function send(obj: any) {
     if (state.ws && state.ws.readyState === WebSocket.OPEN)

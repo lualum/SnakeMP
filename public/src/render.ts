@@ -14,7 +14,7 @@ import {
     THICKNESS,
     BLINK_DURATION,
     DEATH_ANIM_MS,
-} from "../shared/config";
+} from "@shared/config";
 import { state } from "./index";
 
 export const canvas = document.getElementById(
