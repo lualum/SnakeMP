@@ -17,9 +17,8 @@ jobs:
                   username: ${{ secrets.VM_USER }}
                   key: ${{ secrets.VM_SSH_KEY }}
                   script: |
-                      cd /opt/snake-mp
-                      git pull origin main
-                      npm ci
-                      npm run build
+                      cd /opt/SnakeMP
+                      sudo git pull origin main
+                      sudo npm ci
+                      sudo npm run build
                       sudo systemctl restart snake-mp
-                      pm2 reload snake-mp
