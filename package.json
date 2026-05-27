@@ -14,7 +14,8 @@
         "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
         "dev:server": "tsx watch --tsconfig server/tsconfig.json server/src/index.ts",
         "dev:client": "vite",
-        "start": "node dist/server/index.js"
+        "start": "node dist/server/index.js",
+        "clean": "rm -rf dist"
     },
     "dependencies": {
         "express": "^4.18.2",
