@@ -5,10 +5,16 @@
     "main": "dist/server/index.js",
     "type": "module",
     "scripts": {
-        "build": "tsc --build && vite build",
+        "build": "pnpm run build:shared && pnpm run build:fix-esm && pnpm run build:client && pnpm run build:server && pnpm run build:alias",
+        "build:client": "vite build",
+        "build:server": "cd server && tsc --build tsconfig.build.json",
+        "build:shared": "cd shared && tsc --build",
+        "build:fix-esm": "node scripts/fix-esm-relative-imports.mjs dist/shared",
+        "build:alias": "tsc-alias -p server/tsconfig.alias.json -f -fe .js",
         "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
         "dev:server": "tsx watch --tsconfig server/tsconfig.json server/src/index.ts",
-        "dev:client": "vite"
+        "dev:client": "vite",
+        "start": "node dist/server/index.js"
     },
     "dependencies": {
         "express": "^4.18.2",
@@ -19,6 +25,7 @@
         "@types/node": "^20.19.41",
         "@types/ws": "^8.5.4",
         "concurrently": "^8.2.2",
+        "tsc-alias": "^1.8.17",
         "tsx": "^4.22.3",
         "typescript": "^6.0.3",
         "vite": "^8.0.13"
