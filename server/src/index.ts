@@ -35,7 +35,8 @@ app.use(express.static(clientDist));
 
 app.get("/games/:roomCode", (req, res) => {
     const roomCode = String(req.params.roomCode ?? "").toUpperCase();
-    if (!/^[A-Z0-9]{4}$/.test(roomCode)) return res.status(404).send("Invalid room code");
+    if (!/^[A-Z0-9]{4}$/.test(roomCode))
+        return res.status(404).send("Invalid room code");
     res.sendFile(path.join(clientDist, "index.html"));
 });
 
@@ -101,13 +102,19 @@ function makeHooks(code: string, getRoom: () => Room | undefined): GameHooks {
             }
         },
 
-        onFruitEaten(pid, fruitId, newFruit) {
+        onFruitEaten(pid, fruitId, _clientNewFruit) {
             const room = getRoom();
             if (!room) return;
 
             room.state.combo[pid]++;
             room.state.combo[1 - pid] = 0;
             room.state.score[pid] += room.state.combo[pid];
+
+            // Server is the sole authority on fruit placement; ignore the
+            // client-supplied value and compute the replacement here so both
+            // clients receive the same authoritative position.
+            const newFruit = room.state.getFruitLoc(fruitId);
+            if (newFruit) room.state.fruits.set(fruitId, newFruit);
 
             broadcast(room, {
                 type: "fruit_eaten",

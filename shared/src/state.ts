@@ -121,19 +121,21 @@ export class State {
         // apply visual movement; calling kill() locally causes the desync where
         // one client shows a death the other never received.
 
-        let fruit: number | null = null;
+        let fruitEaten = false;
 
         for (const [fid, [fx, fy]] of this.fruits) {
             if (fx === nx && fy === ny) {
+                // Remove the eaten fruit locally; the server is the sole authority
+                // on where the replacement spawns. The new position arrives via
+                // the "fruit_eaten" broadcast and is applied in network.ts.
                 this.fruits.delete(fid);
-                const newFruit = this.getFruitLoc(fid);
-                fruit = fid;
-                this.hooks.onFruitEaten(pid, fid, newFruit);
+                fruitEaten = true;
+                this.hooks.onFruitEaten(pid, fid, null);
                 break;
             }
         }
 
-        if (!fruit) s.body.pop();
+        if (!fruitEaten) s.body.pop();
 
         this.hooks.onMove(pid, dir);
     }
