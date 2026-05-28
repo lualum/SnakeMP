@@ -2,6 +2,7 @@ import express from "express";
 import path from "path";
 import * as http from "http";
 import { WebSocketServer, WebSocket } from "ws";
+import { serverConfig } from "@shared/server-config";
 import { GameHooks, State } from "@shared/state";
 import {
     COLS,
@@ -296,4 +297,5 @@ wss.on("connection", (ws: ExtendedWebSocket) => {
     });
 });
 
-server.listen(8000, () => console.log("Server listening on port 8000"));
+const PORT = serverConfig.PORT;
+server.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
