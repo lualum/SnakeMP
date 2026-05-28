@@ -71,12 +71,14 @@ export function connectWS(onOpen: () => void) {
         if (msg.type === "created") {
             document.getElementById("room-code-display")!.textContent =
                 msg.code;
+            state.code = msg.code;
             const waiting = document.getElementById("waiting")!;
             waiting.classList.remove("hidden");
             waiting.style.display = "flex";
             document.getElementById("lobby-main")!.classList.add("hidden");
         } else if (msg.type === "start") {
             state.myId = msg.pid;
+            state.code = msg.code;
             state.startRound(true, msg.fruits);
         } else if (msg.type === "error") {
             setStatus(msg.msg);
@@ -88,5 +90,6 @@ export function connectWS(onOpen: () => void) {
     state.ws.onclose = () => {
         if (state.gameRunning)
             showOverlay("DISCONNECTED", "connection lost", "neutral");
+        state.code = null;
     };
 }

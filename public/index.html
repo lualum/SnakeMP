@@ -26,7 +26,8 @@
     </div>
     <div id="waiting" class="hidden" style="flex-direction:column;align-items:center;gap:14px;">
       <span class="hint">ROOM CODE</span>
-      <div class="code-big" id="room-code-display"></div>
+      <div class="code-big" id="room-code-display" title="Click to copy link"></div>
+      <span class="hint copy-hint">CLICK CODE TO COPY LINK</span>
       <span class="hint">WAITING FOR OPPONENT...</span>
     </div>
     <div id="status"></div>
@@ -56,6 +57,8 @@
     </div>
     <div class="controls-hint">WASD / ARROW KEYS &nbsp;·&nbsp; BOTH PRESS PLAY AGAIN TO RESTART</div>
   </div>
+
+  <div id="toast-container"></div>
 
   <script type="module" src="/src/index.ts"></script>
 </body>

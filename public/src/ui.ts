@@ -15,17 +15,46 @@ document.addEventListener("DOMContentLoaded", () => {
     const roomCode = getRoomCodeFromPath(window.location.pathname);
     if (roomCode) {
         showJoin();
-        const input = document.getElementById("code-input") as
-            | HTMLInputElement
-            | null;
+        const input = document.getElementById(
+            "code-input",
+        ) as HTMLInputElement | null;
         if (input) input.value = roomCode;
         setStatus(`JOINING ${roomCode}...`);
         connectWS(() => send({ type: "join", code: roomCode }));
     }
+
+    const codeDisplay = document.getElementById(
+        "room-code-display",
+    ) as HTMLDivElement;
+    codeDisplay.addEventListener("click", () => {
+        const url = new URL(
+            window.location.origin + "/games/" + (state.code ?? ""),
+        );
+        navigator.clipboard.writeText(url.toString());
+        showToast("LINK COPIED!");
+        codeDisplay.blur();
+    });
 });
+
+export function showToast(message: string, isError = false) {
+    const container = document.getElementById("toast-container")!;
+    const toast = document.createElement("div");
+    toast.className = "toast" + (isError ? " toast-error" : "");
+    toast.textContent = message;
+    container.appendChild(toast);
+
+    const duration = 2200;
+    const fadeAt = duration - 280;
+
+    setTimeout(() => {
+        toast.classList.add("toast-out");
+        setTimeout(() => toast.remove(), 280);
+    }, fadeAt);
+}
 
 export function createRoom() {
     connectWS(() => send({ type: "create" }));
+    showToast("CREATING ROOM...");
 }
 
 export function showJoin() {
@@ -44,8 +73,10 @@ export function joinRoom() {
     const code = input.value.trim().toUpperCase();
     if (code.length !== 4) {
         setStatus("NEED 4-LETTER CODE");
+        showToast("ENTER A 4-LETTER CODE", true);
         return;
     }
+    showToast(`JOINING ${code}...`);
     connectWS(() => send({ type: "join", code }));
 }
 
@@ -91,6 +122,7 @@ export function hideOverlay() {
 export function requestRestart() {
     document.getElementById("overlay-sub")!.textContent =
         "waiting for opponent...";
+    showToast("RESTART REQUESTED");
     send({ type: "restart" });
 }
 

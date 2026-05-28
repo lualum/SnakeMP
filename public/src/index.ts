@@ -6,6 +6,7 @@ import { MS_TILE } from "@shared/config";
 
 class ClientState extends State {
     ws: WebSocket | null = null;
+    code: string | null = null;
     myId: number = 0;
     animFrame: number | null = null;
 
