@@ -1,5 +1,8 @@
+import express from "express";
+import path from "path";
 import * as http from "http";
 import { WebSocketServer, WebSocket } from "ws";
+import { serverConfig } from "@shared/server-config";
 import { GameHooks, State } from "@shared/state";
 import {
     COLS,
@@ -22,7 +25,19 @@ interface Room {
     state: State;
 }
 
-const server = http.createServer();
+const dirname = import.meta?.dirname || __dirname;
+
+const app = express();
+
+const clientDist = path.resolve(dirname, "../../dist/public");
+
+app.use(express.static(clientDist));
+
+app.get("*", (_req, res) => {
+  res.sendFile(path.join(clientDist, "index.html"));
+});
+
+const server = http.createServer(app);
 const wss = new WebSocketServer({ server });
 const rooms = new Map<string, Room>();
 const waiting = new Map<string, ExtendedWebSocket>();
@@ -282,4 +297,5 @@ wss.on("connection", (ws: ExtendedWebSocket) => {
     });
 });
 
-server.listen(8000, () => console.log("Server listening on port 8000"));
+const PORT = serverConfig.PORT;
+server.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
