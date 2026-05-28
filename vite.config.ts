@@ -3,6 +3,8 @@ import { fileURLToPath } from "url";
 import { defineConfig } from "vite";
 
 export default defineConfig({
+    // Ensure deep links like /games/ABCD serve index.html in dev.
+    appType: "spa",
     root: "public",
     resolve: {
         alias: { "@shared": path.resolve(process.cwd(), "shared/src") },

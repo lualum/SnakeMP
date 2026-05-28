@@ -33,8 +33,15 @@ const clientDist = path.resolve(dirname, "../../dist/public");
 
 app.use(express.static(clientDist));
 
+app.get("/games/:roomCode", (req, res) => {
+    const roomCode = String(req.params.roomCode ?? "").toUpperCase();
+    if (!/^[A-Z0-9]{4}$/.test(roomCode)) return res.status(404).send("Invalid room code");
+    res.sendFile(path.join(clientDist, "index.html"));
+});
+
+// SPA fallback (must stay after other routes).
 app.get("*", (_req, res) => {
-  res.sendFile(path.join(clientDist, "index.html"));
+    res.sendFile(path.join(clientDist, "index.html"));
 });
 
 const server = http.createServer(app);

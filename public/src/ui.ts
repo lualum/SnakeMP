@@ -11,6 +11,17 @@ document.addEventListener("DOMContentLoaded", () => {
     document
         .getElementById("btn-restart")
         ?.addEventListener("click", requestRestart);
+
+    const roomCode = getRoomCodeFromPath(window.location.pathname);
+    if (roomCode) {
+        showJoin();
+        const input = document.getElementById("code-input") as
+            | HTMLInputElement
+            | null;
+        if (input) input.value = roomCode;
+        setStatus(`JOINING ${roomCode}...`);
+        connectWS(() => send({ type: "join", code: roomCode }));
+    }
 });
 
 export function createRoom() {
@@ -40,6 +51,14 @@ export function joinRoom() {
 
 export function setStatus(m: string) {
     document.getElementById("status")!.textContent = m;
+}
+
+function getRoomCodeFromPath(pathname: string): string | null {
+    const match = pathname.match(/^\/games\/([A-Za-z0-9]{4})\/?$/);
+    if (!match) return null;
+    const code = match[1].toUpperCase();
+    if (!/^[A-Z0-9]{4}$/.test(code)) return null;
+    return code;
 }
 
 export function updateHud() {
