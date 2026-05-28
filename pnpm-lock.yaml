@@ -9,7 +9,7 @@ importers:
   .:
     dependencies:
       express:
-        specifier: ^4.18.2
+        specifier: ^4.22.2
         version: 4.22.2
       ws:
         specifier: ^8.13.0

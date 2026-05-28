@@ -1,3 +1,5 @@
+import express from "express";
+import path from "path";
 import * as http from "http";
 import { WebSocketServer, WebSocket } from "ws";
 import { GameHooks, State } from "@shared/state";
@@ -22,7 +24,19 @@ interface Room {
     state: State;
 }
 
-const server = http.createServer();
+const dirname = import.meta?.dirname || __dirname;
+
+const app = express();
+
+const clientDist = path.resolve(dirname, "../../dist/public");
+
+app.use(express.static(clientDist));
+
+app.get("*", (_req, res) => {
+  res.sendFile(path.join(clientDist, "index.html"));
+});
+
+const server = http.createServer(app);
 const wss = new WebSocketServer({ server });
 const rooms = new Map<string, Room>();
 const waiting = new Map<string, ExtendedWebSocket>();
